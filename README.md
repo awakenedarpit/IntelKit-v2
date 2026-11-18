@@ -10,12 +10,13 @@ A Telegram-only Python bot that extracts useful knowledge from public Instagram 
 - Image OCR, carousel ordering/aggregation, video frame/audio extraction through FFmpeg.
 - Concise structured report formatting with optional claims-to-verify section.
 - Instagram public-page best-effort retrieval using visible `og:image` metadata; no authentication bypass.
+- Public Instagram posts include available captions in the analysis prompt; public Reels are analyzed from `og:video` frames and, when Groq is configured, a Whisper speech transcript.
 - `/start`, `/help`, and `/status` Telegram commands.
 - Automated tests that do not require real credentials.
 
 ## Limitations
 
-The initial database-free Render architecture has no durable job queue, user history, or crash recovery for in-flight media. Instagram access depends on public HTML and can fail because Instagram changes or restricts delivery; upload the media directly when that happens. Speech transcription is intentionally a hook until a compatible STT credential is configured. Install the system `ffmpeg` binary for video processing.
+The initial database-free Render architecture has no durable job queue, user history, or crash recovery for in-flight media. Instagram access depends on public HTML and can fail because Instagram changes or restricts delivery; upload the media directly when that happens. Reel speech transcription uses Groq Whisper when `GROQ_API_KEY` is configured. Install the system `ffmpeg` binary for video processing.
 
 ## Local macOS setup
 

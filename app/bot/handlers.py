@@ -94,8 +94,11 @@ async def text(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await update.message.reply_text('Retrieving public Instagram metadata…')
         try:
             with temporary_workspace() as workspace:
-                _, path = await retrieve(value, workspace)
-                report = await process_image(path, context.application.bot_data['extractor'])
+                kind, path, caption = await retrieve(value, workspace)
+                if path.suffix.lower() in ('.mp4', '.m4v'):
+                    report = await process_video(path, context.application.bot_data['extractor'], workspace, caption)
+                else:
+                    report = await process_image(path, context.application.bot_data['extractor'], caption)
             await send_report(update.message, report)
         except Exception as exc:
             log.info('Instagram retrieval unavailable: %s', exc)

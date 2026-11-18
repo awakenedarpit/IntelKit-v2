@@ -18,9 +18,13 @@ async def retrieve(url, workspace):
     async with httpx.AsyncClient(follow_redirects=True,timeout=20,headers={'User-Agent':'IntelKit/1.0'}) as c: r=await c.get(url)
     if r.status_code!=200: raise RuntimeError('Instagram content could not be retrieved publicly. Please upload the media directly.')
     # Public metadata is best-effort and never bypasses access controls.
-    media_url=_meta_content(r.text, 'og:image')
+    caption=_meta_content(r.text, 'og:description') or ''
+    media_url=_meta_content(r.text, 'og:video') if kind in ('reel', 'tv') else None
+    media_url=media_url or _meta_content(r.text, 'og:image')
     if not media_url: raise RuntimeError('Instagram media was not publicly retrievable. Please upload it directly.')
     data=await c.get(media_url)
     if data.status_code != 200 or not data.content:
         raise RuntimeError('Instagram media download was blocked. Please upload it directly.')
-    p=Path(workspace)/'instagram.jpg'; p.write_bytes(data.content); return kind,p
+    content_type=data.headers.get('content-type','').lower()
+    suffix='.mp4' if 'video' in content_type or kind in ('reel','tv') and media_url.lower().split('?')[0].endswith(('.mp4','.m4v')) else '.jpg'
+    p=Path(workspace)/('instagram'+suffix); p.write_bytes(data.content); return kind,p,caption
