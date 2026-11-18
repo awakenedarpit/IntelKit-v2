@@ -3,12 +3,15 @@ from fastapi.testclient import TestClient
 from app.main import app
 from app.config import Settings
 from app.intelligence.deduplicator import deduplicate
-from app.processors.instagram_processor import classify
+from app.processors.instagram_processor import classify, _meta_content
 from app.intelligence.report_generator import format_report
 from app.providers.base import ProviderResult, ProviderError
 from app.providers.manager import AIProviderManager
 def test_health(): assert TestClient(app).get('/health').status_code==200
 def test_urls(): assert classify('https://instagram.com/reel/ABC123')=='reel'; assert classify('https://instagram.com/nope') is None
+def test_instagram_meta_attribute_order():
+    html='<meta content="https://cdn.example/image.jpg" property="og:image">'
+    assert _meta_content(html, 'og:image') == 'https://cdn.example/image.jpg'
 def test_deduplicate(): assert deduplicate(['A fact','a fact','B'])==['A fact','B']
 def test_report():
     out=format_report(json.dumps({'sections':[{'title':'Main Takeaway','bullets':['Useful point']}]}),'test'); assert 'Useful point' in out and 'Main Takeaway' in out
