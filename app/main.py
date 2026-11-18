@@ -50,9 +50,15 @@ if telegram_app is not None:
 
 @app.get('/')
 async def root():
+    if not settings.telegram_bot_token:
+        telegram_status = 'missing TELEGRAM_BOT_TOKEN'
+    elif settings.app_env == 'production':
+        telegram_status = 'webhook active' if telegram_app is not None else 'webhook unavailable'
+    else:
+        telegram_status = 'configured for local polling'
     return {
         'name': 'IntelKit',
         'tagline': 'AI-Powered Content Intelligence',
         'environment': settings.app_env,
-        'telegram': 'configured' if telegram_app is not None else 'not configured',
+        'telegram': telegram_status,
     }

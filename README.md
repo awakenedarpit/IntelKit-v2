@@ -29,10 +29,19 @@ brew install ffmpeg tesseract
 cp .env.example .env
 # edit .env and set TELEGRAM_BOT_TOKEN plus at least one AI key
 pytest -q
-APP_ENV=development python -m uvicorn app.main:app --reload
 ```
 
-After credentials are configured, run polling locally with `python scripts/run_polling.py`; production never runs polling. The current build keeps import/startup testable without requiring a token.
+For localhost Telegram testing, use two terminals after editing `.env`:
+
+```bash
+# Terminal 1: optional health/API server
+python -m uvicorn app.main:app --reload
+
+# Terminal 2: Telegram long polling process
+python scripts/run_polling.py
+```
+
+The polling process is the process that receives Telegram messages. Running only Uvicorn does not start polling. In development, the root endpoint should report `configured for local polling`; `missing TELEGRAM_BOT_TOKEN` means `.env` is absent or the token value is blank. Production never runs polling.
 
 ## Render
 
