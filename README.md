@@ -5,6 +5,7 @@ A Telegram-only Python bot that extracts useful knowledge from public Instagram 
 ## What is implemented
 
 - FastAPI health endpoint and production webhook endpoint with Telegram secret validation.
+- Production startup initializes the Telegram application, starts its update processor, and automatically registers `WEBHOOK_BASE_URL/telegram/webhook` with Telegram.
 - Development-safe provider manager with Groq → Gemini → OpenRouter fallback.
 - Image OCR, carousel ordering/aggregation, video frame/audio extraction through FFmpeg.
 - Concise structured report formatting with optional claims-to-verify section.
@@ -39,7 +40,7 @@ Build command: `pip install -r requirements.txt`
 
 Start command: `uvicorn app.main:app --host 0.0.0.0 --port $PORT`
 
-Set `APP_ENV=production`, `WEBHOOK_BASE_URL`, `TELEGRAM_WEBHOOK_SECRET`, `TELEGRAM_BOT_TOKEN`, and the provider keys. After deployment, register the webhook with Telegram using the Render URL and secret.
+Set `APP_ENV=production`, `WEBHOOK_BASE_URL` to the full Render service URL such as `https://your-service.onrender.com`, `TELEGRAM_WEBHOOK_SECRET`, `TELEGRAM_BOT_TOKEN`, and the provider keys. On every production startup, IntelKit registers `https://your-service.onrender.com/telegram/webhook` automatically; no separate webhook command is required.
 
 ## Testing checklist
 
